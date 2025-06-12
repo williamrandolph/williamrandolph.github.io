@@ -6,39 +6,40 @@
     <script src="https://unpkg.com/tone"></script>
     <script>
       function playNote() {
-				// create a synth
+        // create a synth
         const reverb = new Tone.Reverb().toDestination();
 
-				const synth = new Tone.MonoSynth({
+        const synth = new Tone.MonoSynth({
           volume: -8,
-         oscillator: {
-					type: "square8",
-				},
-				envelope: {
-					attack: 0.09,
-					decay: 0.3,
-					sustain: 1,
-					release: 0.8,
-				},
-				filterEnvelope: {
-					attack: 0.005,
-					decay: 0.07,
-					sustain: 0.1,
-					release: 0.8,
-					baseFrequency: 300,
-					octaves: 4,
-				}, 
+          oscillator: {
+            type: "square8",
+          },
+          envelope: {
+            attack: 0.09,
+            decay: 0.3,
+            sustain: 1,
+            release: 0.8,
+          },
+          filterEnvelope: {
+            attack: 0.005,
+            decay: 0.07,
+            sustain: 0.1,
+            release: 0.8,
+            baseFrequency: 300,
+            octaves: 4,
+          },
         }).connect(reverb);
-				// play a note from that synth
+        
+        // play a note from that synth
         const notes = ['C4', 'D4', 'E4', 'A4', 'G4', 'E4', 'A3', 'C4'];
         const noteDuration = '4n'; // Eighth note duration
         
         let time = Tone.now();
         
         notes.forEach((note, index) => {
-            synth.triggerAttackRelease(note, noteDuration, time + index * 0.3);
+          synth.triggerAttackRelease(note, noteDuration, time + index * 0.3);
         });
-			}
+      }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
