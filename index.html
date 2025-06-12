@@ -6,13 +6,15 @@
     <script src="https://unpkg.com/tone"></script>
     <script>
       function playNote() {
-        // create a synth
-        const reverb = new Tone.Reverb().toDestination();
+        const feedbackDelay = new Tone.FeedbackDelay(0.700, 0.60).toDestination();
+        const reverb = new Tone.Reverb().connect(feedbackDelay);
 
+        // create a synth
         const synth = new Tone.MonoSynth({
           volume: -8,
           oscillator: {
-            type: "square8",
+            type: "pwm",
+            width: 0.60,
           },
           envelope: {
             attack: 0.09,
@@ -30,15 +32,18 @@
           },
         }).connect(reverb);
         
-        // play a note from that synth
-        const notes = ['C4', 'D4', 'E4', 'A4', 'G4', 'E4', 'A3', 'C4'];
-        const noteDuration = '4n'; // Eighth note duration
-        
-        let time = Tone.now();
-        
-        notes.forEach((note, index) => {
-          synth.triggerAttackRelease(note, noteDuration, time + index * 0.3);
-        });
+        [
+          ['C4', '4t', "0:0:0"],
+          ['D4', '8t', "0:1"],
+          ['E4', '8t', "0:1:2"],
+          ['A4', '2t', "0:2"],
+          ['G4', '4t', "1:0"],
+          ['E4', '8t', "1:1"],
+          ['A3', '8t', "1:1:2"],
+          ['C4', '2t', "1:2"],
+        ].forEach((item, index) => {
+          synth.triggerAttackRelease(item[0], item[1], item[2]);
+        })
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
