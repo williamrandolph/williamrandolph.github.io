@@ -32,18 +32,21 @@
           },
         }).connect(reverb);
         
-        [
-          ['C4', '4t', "0:0:0"],
-          ['D4', '8t', "0:1"],
-          ['E4', '8t', "0:1:2"],
-          ['A4', '2t', "0:2"],
-          ['G4', '4t', "1:0"],
-          ['E4', '8t', "1:1"],
-          ['A3', '8t', "1:1:2"],
-          ['C4', '2t', "1:2"],
-        ].forEach((item, index) => {
-          synth.triggerAttackRelease(item[0], item[1], item[2]);
-        })
+        const notes = [
+          ['C4', '4n', 0.0],
+          ['D4', '8n', 0.60],
+          ['E4', '8n', 0.90],
+          ['A4', '2n', 1.20],
+          ['G4', '4n', 2.40],
+          ['E4', '8n', 3.20],
+          ['A3', '8n', 3.50],
+          ['C4', '2n', 3.80]
+        ]
+
+        let time = Tone.now()
+        notes.forEach((item, index) => {
+          synth.triggerAttackRelease(item[0], item[1], time + item[2]);
+        });
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
