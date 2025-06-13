@@ -8,9 +8,11 @@ This is a simple static website hosted on GitHub Pages at williamrandolph.github
 
 ## Architecture
 
-- **Static HTML**: Single-page website with minimal HTML structure
+- **Static HTML**: Single-page website with HTML, CSS, and JavaScript
 - **GitHub Pages**: Deployed directly from the main branch root directory
 - **No build process**: Files are served as-is from the repository
+- **Assets**: Images stored in `/images/` directory
+- **Interactive elements**: Tone.js integration for audio synthesis
 
 ## Deployment
 
