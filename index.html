@@ -5,48 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://unpkg.com/tone"></script>
     <script>
+      const feedbackDelay = new Tone.FeedbackDelay(0.700, 0.30).toDestination();
+      const reverb = new Tone.Reverb().connect(feedbackDelay);
+
+      // create a synth
+      const synth = new Tone.MonoSynth({
+        volume: -8,
+        oscillator: {
+          type: "pwm",
+          width: 0.60,
+        },
+        envelope: {
+          attack: 0.09,
+          decay: 0.3,
+          sustain: 1,
+          release: 0.8,
+        },
+        filterEnvelope: {
+          attack: 0.005,
+          decay: 0.07,
+          sustain: 0.1,
+          release: 0.8,
+          baseFrequency: 300,
+          octaves: 4,
+        },
+      }).connect(reverb);
+
+      const bassSynth = new Tone.MonoSynth({
+        volume: -15,
+        oscillator: {
+          type: "sawtooth"
+        },
+        envelope: {
+          attack: 1,
+          decay: 0.5,
+        },
+        filterEnvelope: {
+          attack: 0.5,
+          decay: 1, 
+          sustain: 0.75,
+          // baseFrequency: 55,
+          baseFrequency: 110,
+        }
+      }).toDestination()
+
+      var lfo = new Tone.LFO(0.1, 0, 200); // hertz, min, max
+      lfo.connect(bassSynth.filter.frequency)
+      lfo.start()
+      
+      const notes = ['A3', 'C4','D4','E4', 'G4', 'A4', 'C5'];
+
+      // loop the synth
+      const loop = new Tone.Loop((time) => {
+        const note = notes[Math.floor(Math.random()*notes.length)]
+        synth.triggerAttackRelease(note, "8t", time)
+        if (Math.random() < 0.5) {
+          const note = notes[Math.floor(Math.random()*notes.length)]
+          synth.triggerAttackRelease(note, "8t", time + Tone.Time("8n").toSeconds())
+        }
+      }, "4n").start(0);
+
+      const bassLoop = new Tone.Loop((time) => {
+        bassSynth.triggerAttackRelease("A1", Tone.Time("8n").toSeconds() * 7, time)
+        bassSynth.triggerAttackRelease("C2", "4n.", time + Tone.Time("1m").toSeconds())
+        bassSynth.triggerAttackRelease("F2", "4n.", time + (Tone.Time("2n").toSeconds() * 3))
+      }, "2m").start(0);
+
       function playNote() {
-        const feedbackDelay = new Tone.FeedbackDelay(0.700, 0.60).toDestination();
-        const reverb = new Tone.Reverb().connect(feedbackDelay);
-
-        // create a synth
-        const synth = new Tone.MonoSynth({
-          volume: -8,
-          oscillator: {
-            type: "pwm",
-            width: 0.60,
-          },
-          envelope: {
-            attack: 0.09,
-            decay: 0.3,
-            sustain: 1,
-            release: 0.8,
-          },
-          filterEnvelope: {
-            attack: 0.005,
-            decay: 0.07,
-            sustain: 0.1,
-            release: 0.8,
-            baseFrequency: 300,
-            octaves: 4,
-          },
-        }).connect(reverb);
-        
-        const notes = [
-          ['C4', '4n', 0.0],
-          ['D4', '8n', 0.60],
-          ['E4', '8n', 0.90],
-          ['A4', '2n', 1.20],
-          ['G4', '4n', 2.40],
-          ['E4', '8n', 3.20],
-          ['A3', '8n', 3.50],
-          ['C4', '2n', 3.80]
-        ]
-
-        let time = Tone.now()
-        notes.forEach((item, index) => {
-          synth.triggerAttackRelease(item[0], item[1], time + item[2]);
-        });
+        Tone.getTransport().start();
+      }
+      
+      function stopMusic() {
+        Tone.getTransport().stop();
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,6 +133,7 @@
 
     <h3>Music</h3>
     <button onclick="playNote()">enjoy a little Tone.js</button>
+    <button onclick="stopMusic()">stop the music</button>
     <p>I'm definitely going to do more with that Javascript synthesizer.</p>
   </body>
 </html>
