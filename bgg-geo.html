@@ -58,13 +58,54 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             width: 220px;
         }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 6px;
+            color: #666;
+            line-height: 1;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+            min-width: 26px;
+            text-align: center;
+        }
+
+        .collapse-btn:hover {
+            color: #333;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .controls-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        .controls.collapsed .controls-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .controls:not(.collapsed) .controls-content {
+            max-height: 500px;
+            opacity: 1;
+        }
         
         .controls h4 {
             margin: 0 0 10px 0;
             color: #2c3e50;
         }
         
-        .controls button {
+        .controls button:not(.collapse-btn) {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
@@ -79,11 +120,11 @@
             text-align: center;
         }
         
-        .controls button:hover {
+        .controls button:not(.collapse-btn):hover {
             background: #2980b9;
         }
         
-        .controls button:disabled {
+        .controls button:not(.collapse-btn):disabled {
             background: #bdc3c7;
             cursor: not-allowed;
         }
@@ -165,6 +206,28 @@
             font-size: 12px;
             max-width: 250px;
         }
+
+        .legend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .legend-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        .legend.collapsed .legend-content {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .legend:not(.collapsed) .legend-content {
+            max-height: 400px;
+            opacity: 1;
+        }
         
         .legend h4 {
             margin: 0 0 10px 0;
@@ -214,6 +277,36 @@
         .legend-info a:hover {
             text-decoration: underline;
         }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .controls {
+                width: calc(100vw - 40px);
+                max-width: 300px;
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+
+            .legend {
+                width: calc(100vw - 40px);
+                max-width: 300px;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+            }
+
+            /* Start collapsed on mobile */
+            .controls.mobile-collapsed .controls-content {
+                max-height: 0;
+                opacity: 0;
+            }
+
+            .legend.mobile-collapsed .legend-content {
+                max-height: 0;
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -223,74 +316,85 @@
     </div>
     
     <div id="controls" class="controls">
-        <h4>Board Game Geography</h4>
-        
-        <div class="filter-section">
-            <label for="top-n-select">BGG Ranking:</label>
-            <select id="top-n-select" onchange="updateFilters()">
-                <option value="all">All Games</option>
-                <option value="100">Top 100</option>
-                <option value="500">Top 500</option>
-                <option value="1000">Top 1000</option>
-                <option value="5000">Top 5000</option>
-            </select>
+        <div class="controls-header">
+            <h4 style="margin: 0;">Board Game Geography</h4>
+            <button class="collapse-btn" onclick="toggleControls()" title="Toggle filters">−</button>
         </div>
         
-        <div class="filter-section">
-            <label for="category-select">Categories:</label>
-            <select id="category-select" multiple size="5" onchange="updateFilters()">
-                <!-- Categories will be populated dynamically -->
-            </select>
-            <div class="category-info">Hold Ctrl/Cmd to select multiple</div>
-        </div>
-        
-        <button id="load-pipeline" onclick="loadPipelineData()">Reload Games</button>
-        <button id="clear-data" onclick="clearAllData()">Clear All Data</button>
-        
-        <div id="stats" class="stats">
-            <div>Database: Loading...</div>
-        </div>
-        
-        <div id="progress" class="progress" style="display: none;">
-            <div id="progress-text">Importing...</div>
+        <div class="controls-content">
+            <div class="filter-section">
+                <label for="top-n-select">BGG Ranking:</label>
+                <select id="top-n-select" onchange="updateFilters()">
+                    <option value="all">All Games</option>
+                    <option value="100">Top 100</option>
+                    <option value="500">Top 500</option>
+                    <option value="1000">Top 1000</option>
+                    <option value="5000">Top 5000</option>
+                </select>
+            </div>
+            
+            <div class="filter-section">
+                <label for="category-select">Categories:</label>
+                <select id="category-select" multiple size="5" onchange="updateFilters()">
+                    <!-- Categories will be populated dynamically -->
+                </select>
+                <div class="category-info">Hold Ctrl/Cmd to select multiple</div>
+            </div>
+            
+            <button id="load-pipeline" onclick="loadPipelineData()">Reload Games</button>
+            <button id="clear-data" onclick="clearAllData()">Clear All Data</button>
+            
+            <div id="stats" class="stats">
+                <div>Database: Loading...</div>
+            </div>
+            
+            <div id="progress" class="progress" style="display: none;">
+                <div id="progress-text">Importing...</div>
+            </div>
         </div>
     </div>
     
     <div id="map"></div>
     
     <div class="legend">
-        <h4>Game Categories</h4>
-        <div class="legend-item">
-            <div class="legend-color legend-red"></div>
-            <span>Wargame</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-green"></div>
-            <span>Economic</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-violet"></div>
-            <span>Medieval/Ancient</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-blue"></div>
-            <span>Card Game</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-orange"></div>
-            <span>City Building</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-grey"></div>
-            <span>Other Categories</span>
+        <div class="legend-header">
+            <h4 style="margin: 0;">Game Categories</h4>
+            <button class="collapse-btn" onclick="toggleLegend()" title="Toggle legend">−</button>
         </div>
         
-        <div class="legend-divider"></div>
-        
-        <div class="legend-info">
-            <p><strong>Data Source:</strong> BoardGameGeek city family tags</p>
-            <p><em>Currently supports cities only. Regions, landmarks, and geographic features coming soon.</em></p>
-            <p><a href="https://github.com/williamrandolph/board-game-geo" target="_blank" rel="noopener">View on GitHub</a></p>
+        <div class="legend-content">
+            <div class="legend-item">
+                <div class="legend-color legend-red"></div>
+                <span>Wargame</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-green"></div>
+                <span>Economic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-violet"></div>
+                <span>Medieval/Ancient</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-blue"></div>
+                <span>Card Game</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-orange"></div>
+                <span>City Building</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-grey"></div>
+                <span>Other Categories</span>
+            </div>
+            
+            <div class="legend-divider"></div>
+            
+            <div class="legend-info">
+                <p><strong>Data Source:</strong> BoardGameGeek city family tags</p>
+                <p><em>Currently supports cities only. Regions, landmarks, and geographic features coming soon.</em></p>
+                <p><a href="https://github.com/williamrandolph/board-game-geo" target="_blank" rel="noopener">View on GitHub</a></p>
+            </div>
         </div>
     </div>
     
@@ -300,5 +404,72 @@
     <script src="src/pipeline-data.js"></script>
     <script src="src/pipeline-loader.js"></script>
     <script src="src/app.js"></script>
+    
+    <script>
+        // Collapsible functionality
+        function toggleControls() {
+            const controls = document.getElementById('controls');
+            const btn = controls.querySelector('.collapse-btn');
+            
+            controls.classList.toggle('collapsed');
+            btn.textContent = controls.classList.contains('collapsed') ? '+' : '−';
+        }
+        
+        function toggleLegend() {
+            const legend = document.querySelector('.legend');
+            const btn = legend.querySelector('.collapse-btn');
+            
+            legend.classList.toggle('collapsed');
+            btn.textContent = legend.classList.contains('collapsed') ? '+' : '−';
+        }
+        
+        // Initialize mobile collapsed state
+        function initializeMobileCollapse() {
+            const isMobile = window.innerWidth <= 768;
+            const controls = document.getElementById('controls');
+            const legend = document.querySelector('.legend');
+            
+            if (isMobile) {
+                controls.classList.add('mobile-collapsed');
+                legend.classList.add('mobile-collapsed');
+                
+                // Update button text
+                const controlsBtn = controls.querySelector('.collapse-btn');
+                const legendBtn = legend.querySelector('.collapse-btn');
+                controlsBtn.textContent = '+';
+                legendBtn.textContent = '+';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeMobileCollapse);
+        
+        // Re-check on window resize
+        window.addEventListener('resize', function() {
+            const isMobile = window.innerWidth <= 768;
+            const controls = document.getElementById('controls');
+            const legend = document.querySelector('.legend');
+            
+            if (isMobile) {
+                if (!controls.classList.contains('collapsed')) {
+                    controls.classList.add('mobile-collapsed');
+                    controls.querySelector('.collapse-btn').textContent = '+';
+                }
+                if (!legend.classList.contains('collapsed')) {
+                    legend.classList.add('mobile-collapsed');
+                    legend.querySelector('.collapse-btn').textContent = '+';
+                }
+            } else {
+                controls.classList.remove('mobile-collapsed');
+                legend.classList.remove('mobile-collapsed');
+                if (!controls.classList.contains('collapsed')) {
+                    controls.querySelector('.collapse-btn').textContent = '−';
+                }
+                if (!legend.classList.contains('collapsed')) {
+                    legend.querySelector('.collapse-btn').textContent = '−';
+                }
+            }
+        });
+    </script>
 </body>
 </html>
