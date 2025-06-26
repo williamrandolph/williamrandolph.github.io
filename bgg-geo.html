@@ -78,6 +78,8 @@
             transition: all 0.2s ease;
             min-width: 26px;
             text-align: center;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            touch-action: manipulation;
         }
 
         .collapse-btn:hover {
@@ -306,6 +308,14 @@
                 max-height: 0;
                 opacity: 0;
             }
+
+            /* Improve touch targets on mobile */
+            .collapse-btn {
+                min-height: 36px;
+                min-width: 36px;
+                padding: 8px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -318,7 +328,7 @@
     <div id="controls" class="controls">
         <div class="controls-header">
             <h4 style="margin: 0;">Board Game Geography</h4>
-            <button class="collapse-btn" onclick="toggleControls()" title="Toggle filters">−</button>
+            <button class="collapse-btn" id="controls-toggle" title="Toggle filters">−</button>
         </div>
         
         <div class="controls-content">
@@ -359,7 +369,7 @@
     <div class="legend">
         <div class="legend-header">
             <h4 style="margin: 0;">Game Categories</h4>
-            <button class="collapse-btn" onclick="toggleLegend()" title="Toggle legend">−</button>
+            <button class="collapse-btn" id="legend-toggle" title="Toggle legend">−</button>
         </div>
         
         <div class="legend-content">
@@ -411,6 +421,8 @@
             const controls = document.getElementById('controls');
             const btn = controls.querySelector('.collapse-btn');
             
+            // Remove mobile-collapsed class and toggle regular collapsed
+            controls.classList.remove('mobile-collapsed');
             controls.classList.toggle('collapsed');
             btn.textContent = controls.classList.contains('collapsed') ? '+' : '−';
         }
@@ -419,6 +431,8 @@
             const legend = document.querySelector('.legend');
             const btn = legend.querySelector('.collapse-btn');
             
+            // Remove mobile-collapsed class and toggle regular collapsed
+            legend.classList.remove('mobile-collapsed');
             legend.classList.toggle('collapsed');
             btn.textContent = legend.classList.contains('collapsed') ? '+' : '−';
         }
@@ -442,7 +456,38 @@
         }
         
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initializeMobileCollapse);
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMobileCollapse();
+            
+            // Add event listeners for toggle buttons
+            const controlsToggle = document.getElementById('controls-toggle');
+            const legendToggle = document.getElementById('legend-toggle');
+            
+            // Use both click and touch events for better mobile support
+            controlsToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleControls();
+            });
+            
+            controlsToggle.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleControls();
+            });
+            
+            legendToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleLegend();
+            });
+            
+            legendToggle.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleLegend();
+            });
+        });
         
         // Re-check on window resize
         window.addEventListener('resize', function() {
